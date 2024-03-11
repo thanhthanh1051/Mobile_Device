@@ -223,6 +223,85 @@ namespace do_an.CRUD_test
             driver.Close();
         }
 
+        [TestMethod]
+        [DataTestMethod]
+        [DataRow(CRUD_data.Category.delete.Consts.name)]
+        public void delete(string name)
+        {
+            bool status = true;
+            try
+            {
+                
+                driver.SwitchTo().NewWindow(WindowType.Tab);
+                driver.Navigate().GoToUrl("http://localhost:81/admin");
+                status = driver != null;
+                if (status)
+                {
+                    var clickCate = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/a[1]/span[1]"));
+                    status = clickCate != null;
+                    if (status)
+                    {
+                        clickCate.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var clickShow = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/div[1]/div[1]/a[1]"));
+                    status = clickShow != null;
+                    if (status)
+                    {
+                        clickShow.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var clickSearch = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                    status = clickSearch != null;
+                    if (status)
+                    {
+                        clickSearch.SendKeys(name);
+                    }
+                    Thread.Sleep(1000);
+                    var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                    Thread.Sleep(1000);
+                    status = dataempty != null;
+                    if (status)
+                    {
+                        driver.Quit();
+                    }
+                    Thread.Sleep(1000);
+                    var searchName = driver.FindElement(By.ClassName("sorting_1"));
+                    bool check = (searchName.Text == name);
+                    if (check)
+                    {
+                        var dele = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[6]/a[1]"));
+                        status = dele != null;
+                        if (status)
+                        {
+                            dele.Click();
+                        }
+                        Thread.Sleep(1000);
+                        var searchAgain = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                        status = searchAgain != null;
+                        if (status)
+                        {
+                            clickSearch.SendKeys(name);
+                        }
+                        Thread.Sleep(1000);
+                        var namecheck = driver.FindElement(By.ClassName("sorting_1"));
+                        bool checkdele = (namecheck.Text == name);
+                        if (checkdele)
+                        {
+                            status = true;
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Assert.IsFalse(status);
+                driver.Close();
+                driver.Quit();
+            }
+            Assert.IsTrue(status);
+            driver.Close();
+        }
 
         [TestCleanup]
         public void clear()
