@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using Microsoft.Office.Interop.Excel;
 using OpenQA.Selenium.Support.UI;
 using System.Net.NetworkInformation;
-namespace do_an
+namespace do_an.CRUD_test
 {
     [TestClass]
-    public class CRUD
+    public class product
     {
         IWebDriver driver = new ChromeDriver();
         [TestInitialize]
@@ -76,15 +76,15 @@ namespace do_an
 
         [TestMethod]
         [DataTestMethod]
-        [DataRow(CRUD_data.createProduct.Consts.code,
-            CRUD_data.createProduct.Consts.name,
-            CRUD_data.createProduct.Consts.amount,
-            CRUD_data.createProduct.Consts.image,
-            CRUD_data.createProduct.Consts.category,
-            CRUD_data.createProduct.Consts.brand,
-            CRUD_data.createProduct.Consts.priceSell,
-            CRUD_data.createProduct.Consts.priceBuy,
-            CRUD_data.createProduct.Consts.storage
+        [DataRow(CRUD_data.Product.createProduct.Consts.code,
+            CRUD_data.Product.createProduct.Consts.name,
+            CRUD_data.Product.createProduct.Consts.amount,
+            CRUD_data.Product.createProduct.Consts.image,
+            CRUD_data.Product.createProduct.Consts.category,
+            CRUD_data.Product.createProduct.Consts.brand,
+            CRUD_data.Product.createProduct.Consts.priceSell,
+            CRUD_data.Product.createProduct.Consts.priceBuy,
+            CRUD_data.Product.createProduct.Consts.storage
             )]
         public void CreateProduct(string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy,string storage)
         {
@@ -243,15 +243,15 @@ namespace do_an
 
         [TestMethod]
         [DataTestMethod]
-        [DataRow(CRUD_data.createProduct.Consts.code,
-            CRUD_data.createProduct.Consts.name,
-            CRUD_data.createProduct.Consts.amount,
-            CRUD_data.createProduct.Consts.image,
-            CRUD_data.createProduct.Consts.category,
-            CRUD_data.createProduct.Consts.brand,
-            CRUD_data.createProduct.Consts.priceSell,
-            CRUD_data.createProduct.Consts.priceBuy,
-            CRUD_data.createProduct.Consts.storage
+        [DataRow(CRUD_data.Product.createProduct.Consts.code,
+            CRUD_data.Product.createProduct.Consts.name,
+            CRUD_data.Product.createProduct.Consts.amount,
+            CRUD_data.Product.createProduct.Consts.image,
+            CRUD_data.Product.createProduct.Consts.category,
+            CRUD_data.Product.createProduct.Consts.brand,
+            CRUD_data.Product.createProduct.Consts.priceSell,
+            CRUD_data.Product.createProduct.Consts.priceBuy,
+            CRUD_data.Product.createProduct.Consts.storage
             )]
         public void UpdateProduct(string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy,string storage)
         {
@@ -348,7 +348,9 @@ namespace do_an
         }
 
         [TestMethod]
-        public void DeleteProduct()
+        [DataTestMethod]
+        [DataRow(CRUD_data.Product.delete.Consts.code)]
+        public void DeleteProduct(string code)
         {
             bool status = true;
             try
@@ -381,7 +383,7 @@ namespace do_an
                     status = search != null;
                     if (status)
                     {
-                        search.SendKeys("ip11");
+                        search.SendKeys(code);
                     }
                     Thread.Sleep(1000);
                     var delete = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[11]/a[1]"));
@@ -395,7 +397,7 @@ namespace do_an
                     status = search != null;
                     if (status)
                     {
-                        search.SendKeys("ip11");
+                        search.SendKeys(code);
                     }
                     Thread.Sleep(1000);
                     var checkItem = driver.FindElement(By.Id("sorting_1"));
@@ -408,10 +410,12 @@ namespace do_an
             }
             catch (Exception ex)
             {
-                Assert.IsFalse(status);
+                Assert.Fail(ex.Message);
+                driver.Close();
                 driver.Quit ();
             }
             Assert.IsTrue(status);
+            driver.Close();
         }
 
         [TestCleanup]

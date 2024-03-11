@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace do_an.CRUD_data.createProduct
+namespace do_an.CRUD_data.Product.createProduct
 {
     public static class Consts
     {
