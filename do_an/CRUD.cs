@@ -15,6 +15,8 @@ namespace do_an
     {
         IWebDriver driver = new ChromeDriver();
         [TestInitialize]
+        //[DataTestMethod]
+        //[DataRow(CRUD_data.login.Consts.email, CRUD_data.login.Consts.password)]
         public void Test_Login()
         {
 
@@ -66,68 +68,25 @@ namespace do_an
             }
             catch (Exception ex)
             {
+                Assert.IsFalse(status);
                 driver.Quit();
             }
             Assert.IsTrue(status);
         }
 
-        //[TestMethod]
-        //public void TestMethod1()
-        //{
-        //    bool status = true;
-        //    try
-        //    {
-        //        driver.Manage().Window.Maximize();
-        //        Thread.Sleep(1000);
-
-        //        driver.Url = "http://localhost:81/";
-        //        driver.Navigate();
-        //        status = driver != null;
-        //        if (status)
-        //        {
-        //            Thread.Sleep(2000);
-        //            var iconLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[3]/div[1]/a[1]/div[1]/span[1]"));
-        //            Thread.Sleep(1000);
-        //            status = iconLogin != null;
-        //            if (status)
-        //            {
-        //                iconLogin.Click();
-        //            }
-        //            Thread.Sleep(1000);
-        //            var enterEmail = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/input[1]"));
-        //            Thread.Sleep(1000);
-        //            status = enterEmail != null;
-        //            if (status)
-        //            {
-        //                enterEmail.SendKeys("admin123@gmail.com");
-        //            }
-        //            Thread.Sleep(2000);
-        //            var enterPassword = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/input[2]"));
-        //            Thread.Sleep(1000);
-        //            status = enterPassword != null;
-        //            if (status)
-        //            {
-        //                enterPassword.SendKeys("admin123");
-        //            }
-        //            Thread.Sleep(2000);
-        //            var clickLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/button[1]"));
-        //            Thread.Sleep(1000);
-        //            status = clickLogin != null;
-        //            if (status)
-        //            {
-        //                clickLogin.Click();
-        //            }
-        //            Thread.Sleep(2000);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        driver.Quit();
-        //    }
-        //}
-
         [TestMethod]
-        public void CreateProduct()
+        [DataTestMethod]
+        [DataRow(CRUD_data.createProduct.Consts.code,
+            CRUD_data.createProduct.Consts.name,
+            CRUD_data.createProduct.Consts.amount,
+            CRUD_data.createProduct.Consts.image,
+            CRUD_data.createProduct.Consts.category,
+            CRUD_data.createProduct.Consts.brand,
+            CRUD_data.createProduct.Consts.priceSell,
+            CRUD_data.createProduct.Consts.priceBuy,
+            CRUD_data.createProduct.Consts.storage
+            )]
+        public void CreateProduct(string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy,string storage)
         {
              bool status = true;
             try
@@ -158,7 +117,7 @@ namespace do_an
                     status = enterCodeProduct != null;
                     if (status)
                     {
-                        enterCodeProduct.SendKeys("ltMac1");
+                        enterCodeProduct.SendKeys(code);
                     }
                     Thread.Sleep(2000);
                     var enterNameProduct = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[3]/input[1]"));
@@ -166,23 +125,23 @@ namespace do_an
                     status = enterNameProduct != null;
                     if (status)
                     {
-                        enterNameProduct.SendKeys("MacBook");
+                        enterNameProduct.SendKeys(name);
                     }
                     Thread.Sleep(2000);
-                    var amount = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[5]/input[1]"));
+                    var addamount = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[5]/input[1]"));
                     Thread.Sleep(1000);
                     status = amount != null;
                     if (status)
                     {
-                        amount.SendKeys("20");
+                        addamount.SendKeys(amount);
                     }
                     Thread.Sleep(2000);
-                    var image = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[7]/input[1]"));
+                    var addimage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[7]/input[1]"));
                     Thread.Sleep(1000);
                     status = image != null;
                     if (status)
                     {
-                        image.SendKeys("C:\\Users\\NITRO\\Downloads\\iphone-14_1.webp");
+                        addimage.SendKeys(image);
                     }
                     Thread.Sleep(2000);
                     var selectCate = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[2]/select[1]"));
@@ -191,7 +150,7 @@ namespace do_an
                     if (status)
                     {
                         var selectElementCategory = new SelectElement(selectCate);
-                        selectElementCategory.SelectByValue("1");
+                        selectElementCategory.SelectByValue(category);
                         selectCate.Click();
                     }
                     Thread.Sleep(2000);
@@ -201,32 +160,32 @@ namespace do_an
                     if (status)
                     {
                         var selectElementBrand = new SelectElement(selectBrand);
-                        selectElementBrand.SelectByValue("1");
+                        selectElementBrand.SelectByValue(brand);
                         selectBrand.Click();
                     }
                     Thread.Sleep(2000);
-                    var priceSell = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[6]/input[1]"));
+                    var addpriceSell = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[6]/input[1]"));
                     Thread.Sleep(1000);
                     status = priceSell != null;
                     if (status)
                     {
-                        priceSell.SendKeys("1000");
+                        addpriceSell.SendKeys(priceSell);
                     }
                     Thread.Sleep(2000);
-                    var priceBuy = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[8]/input[1]"));
+                    var addpriceBuy = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[8]/input[1]"));
                     Thread.Sleep(1000);
                     status = priceBuy != null;
                     if (status)
                     {
-                        priceBuy.SendKeys("1200");
+                        addpriceBuy.SendKeys(priceBuy);
                     }
                     Thread.Sleep(2000);
-                    var storage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[10]/input[1]"));
+                    var addstorage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[10]/input[1]"));
                     Thread.Sleep(1000);
                     status = storage != null;
                     if (status)
                     {
-                        storage.SendKeys("528");
+                        addstorage.SendKeys(storage);
                     }
                     Thread.Sleep(2000);
                     var create = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/button[1]"));
@@ -242,6 +201,7 @@ namespace do_an
             }
             catch (Exception ex)
             {
+                Assert.Fail(ex.Message);
                 driver.Quit();
             }
 
@@ -254,7 +214,7 @@ namespace do_an
                     status = search != null;
                     if (status)
                     {
-                        search.SendKeys("ltMac1");
+                        search.SendKeys("ip12");
                         Thread.Sleep(1000);
                         var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
                         Thread.Sleep(1000);
@@ -265,7 +225,7 @@ namespace do_an
                         }
                         Thread.Sleep(1000);
                         var searchCode = driver.FindElement(By.ClassName("sorting_1"));
-                        bool check = (searchCode.Text == "ltMac1");
+                        bool check = (searchCode.Text == "ip12");
                         if (!check)
                         {
                             driver.Quit();
@@ -278,10 +238,22 @@ namespace do_an
                 driver.Quit();
             }
             Assert.IsTrue(status);
+            driver.Close();
         }
 
         [TestMethod]
-        public void UpdateProduct()
+        [DataTestMethod]
+        [DataRow(CRUD_data.createProduct.Consts.code,
+            CRUD_data.createProduct.Consts.name,
+            CRUD_data.createProduct.Consts.amount,
+            CRUD_data.createProduct.Consts.image,
+            CRUD_data.createProduct.Consts.category,
+            CRUD_data.createProduct.Consts.brand,
+            CRUD_data.createProduct.Consts.priceSell,
+            CRUD_data.createProduct.Consts.priceBuy,
+            CRUD_data.createProduct.Consts.storage
+            )]
+        public void UpdateProduct(string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy,string storage)
         {
             bool status = true;
             try
@@ -316,16 +288,16 @@ namespace do_an
                         status = clickCode != null;
                         if(status)
                         {
-                            
-                            clickCode.SendKeys("ip11");
+                            clickCode.Clear();
+                            clickCode.SendKeys(code);
                         }
                         Thread.Sleep(1000);
                         var NameProduct = driver.FindElement(By.Name("name"));
                         status = NameProduct != null;
                         if (status)
                         {
-                            NameProduct.Click();
-                            NameProduct.SendKeys("Iphone11");
+                            NameProduct.Clear();
+                            NameProduct.SendKeys(name);
                         }
                         Thread.Sleep(1000);
                         var amountPro = driver.FindElement(By.Name("amount"));
@@ -333,22 +305,22 @@ namespace do_an
                         if (status)
                         {
 
-                            amountPro.Click();
-                            amountPro.SendKeys("10");
+                            amountPro.Clear();
+                            amountPro.SendKeys(amount);
                         }
                         Thread.Sleep(1000);
-                        var image = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[7]/input[1]"));
+                        var addimage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[7]/input[1]"));
                         status = image != null;
                         if (status)
                         {
-                            image.SendKeys("C:\\Users\\NITRO\\Downloads\\iphone-14_1.webp");
+                            addimage.SendKeys(image);
                         }
                         Thread.Sleep(1000);
                         var color = driver.FindElement(By.Name("color"));
                         status = color != null;
                         if (status)
                         {
-                            color.Click();
+                            color.Clear();
                             color.SendKeys("#a22525");
                         }
                         Thread.Sleep(1000);
@@ -362,6 +334,7 @@ namespace do_an
                     }
                     else
                     {
+                        Assert.Fail();
                         driver.Quit();
                     }
                 }
@@ -371,12 +344,80 @@ namespace do_an
                 driver.Quit();
             }
             Assert.IsTrue(status);
+            driver.Close();
+        }
+
+        [TestMethod]
+        public void DeleteProduct()
+        {
+            bool status = true;
+            try
+            {
+                driver.SwitchTo().NewWindow(WindowType.Tab);
+                driver.Navigate().GoToUrl("http://localhost:81/admin");
+                status = driver != null;
+                if (status)
+                {
+                    var updateElement = driver.FindElement(By.CssSelector(".nav-item:nth-child(6) span"));
+                    Thread.Sleep(1000);
+                    status = updateElement != null;
+                    updateElement.Click();
+                    Thread.Sleep(1000);
+                    var showList = driver.FindElement(By.LinkText("Show List"));
+                    status = showList != null;
+                    if (status)
+                    {
+                        showList.Click();
+                    }
+                    Thread.Sleep(2000);
+                    var clickdelete = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[11]/a[1]"));
+                    status = clickdelete != null;
+                    if (status)
+                    {
+                        clickdelete.Click();
+                    }
+                    Thread.Sleep(2000);
+                    var search = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                    status = search != null;
+                    if (status)
+                    {
+                        search.SendKeys("ip11");
+                    }
+                    Thread.Sleep(1000);
+                    var delete = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[11]/a[1]"));
+                    status = delete != null;
+                    if (status)
+                    {
+                        delete.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var checkSearch = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                    status = search != null;
+                    if (status)
+                    {
+                        search.SendKeys("ip11");
+                    }
+                    Thread.Sleep(1000);
+                    var checkItem = driver.FindElement(By.Id("sorting_1"));
+                    status = checkItem == null;
+                    if(status == false)
+                    {
+                        status = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Assert.IsFalse(status);
+                driver.Quit ();
+            }
+            Assert.IsTrue(status);
         }
 
         [TestCleanup]
         public void Test_Close()
         {
-            driver.Close();
+            //driver.Close();
             driver.Quit();
         }
     }

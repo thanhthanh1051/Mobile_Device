@@ -60,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CRUD.cs" />
+    <Compile Include="CRUD_data\createProduct.cs" />
+    <Compile Include="CRUD_data\login.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
