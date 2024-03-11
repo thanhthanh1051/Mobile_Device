@@ -218,8 +218,8 @@ namespace do_an.CRUD_test
                         Thread.Sleep(1000);
                         var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
                         Thread.Sleep(1000);
-                        status = dataempty != null;
-                        if (status)
+                        status = dataempty == null;
+                        if (!status)
                         {
                             driver.Quit();
                         }
@@ -336,6 +336,39 @@ namespace do_an.CRUD_test
                     {
                         Assert.Fail();
                         driver.Quit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                driver.Quit();
+            }
+
+            try
+            {
+                if (status)
+                {
+                    var search = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                    Thread.Sleep(1000);
+                    status = search != null;
+                    if (status)
+                    {
+                        search.SendKeys("ip12");
+                        Thread.Sleep(1000);
+                        var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                        Thread.Sleep(1000);
+                        status = dataempty != null;
+                        if (status)
+                        {
+                            driver.Quit();
+                        }
+                        Thread.Sleep(1000);
+                        var searchCode = driver.FindElement(By.ClassName("sorting_1"));
+                        bool check = (searchCode.Text == "ip12");
+                        if (!check)
+                        {
+                            driver.Quit();
+                        }
                     }
                 }
             }

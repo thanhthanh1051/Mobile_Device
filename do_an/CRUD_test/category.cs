@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Microsoft.Office.Interop.Excel;
 using OpenQA.Selenium.Support.UI;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 
 namespace do_an.CRUD_test
 {
@@ -74,7 +75,9 @@ namespace do_an.CRUD_test
         }
 
         [TestMethod]
-        public void create()
+        [DataTestMethod]
+        [DataRow(CRUD_data.Category.create.Consts.name,CRUD_data.Category.create.Consts.description)]
+        public void create(string name, string description)
         {
             bool status = true;
             try
@@ -87,15 +90,144 @@ namespace do_an.CRUD_test
                 {
                     var clickCreate = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/a[1]/span[1]"));
                     status = clickCreate != null;
+                    if(status)
+                    {
+                        clickCreate.Click();    
+                    }
+                    Thread.Sleep(1000);
+                    var clickAdd = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/div[1]/div[1]/a[2]"));
+                    status= clickAdd != null;
+                    if (status)
+                    {
+                        clickAdd.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var enterName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/input[1]"));
+                    status = enterName != null;
+                    if (status)
+                    {
+                        enterName.SendKeys(name);
+                    }
+                    Thread.Sleep(1000);
+                    var enterDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/input[1]"));
+                    status = enterDescription != null;
+                    if (status)
+                    {
+                        enterDescription.SendKeys(description);
+                    }
+                    Thread.Sleep(1000);
+                    var add = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/button[1]"));
+                    status = add != null;
+                    if (status)
+                    {
+                        add.Click();
+                    }
                 }
             }
             catch(Exception ex)
             {
+                Assert.IsFalse(status);
                 driver.Quit();
             }
+            Assert.IsTrue(status);
+            driver.Close();
+        }
+
+        [TestMethod]
+        [DataTestMethod]
+        [DataRow(CRUD_data.Category.update.Consts.name, CRUD_data.Category.update.Consts.description, CRUD_data.Category.update.Consts.newName)]
+        public void Update(string name, string description,string newName)
+        {
+            bool status = true;
+            try
             {
 
+                driver.SwitchTo().NewWindow(WindowType.Tab);
+                driver.Navigate().GoToUrl("http://localhost:81/admin");
+                status = driver != null;
+                if(status)
+                {
+                    var clickCate = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/a[1]/span[1]"));
+                    status = clickCate != null;
+                    if (status)
+                    {
+                        clickCate.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var clickShow = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/div[1]/div[1]/a[1]"));
+                    status = clickShow != null;
+                    if (status)
+                    {
+                        clickShow.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var clickSearch = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                    status = clickSearch != null;
+                    if (status)
+                    {
+                        clickSearch.SendKeys(name);
+                    }
+                    Thread.Sleep(1000);
+                    var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                    Thread.Sleep(1000);
+                    status = dataempty != null;
+                    if (status)
+                    {
+                        driver.Quit();
+                    }
+                    Thread.Sleep(1000);
+                    var searchName = driver.FindElement(By.ClassName("sorting_1"));
+                    bool check = (searchName.Text == name);
+                    if (check)
+                    {
+                        var update = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[5]/a[1]"));
+                        status = update != null;
+                        if (status)
+                        {
+                            update.Click();
+                        }
+                        Thread.Sleep(1000);
+                        var enterName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/input[1]"));
+                        status= enterName != null;
+                        if (status)
+                        {
+                            enterName.Clear();
+                            enterName.SendKeys(newName);
+                        }
+                        Thread.Sleep(1000);
+                        var enterDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/input[1]"));
+                        status=(enterDescription != null);
+                        if (status)
+                        {
+                            enterDescription.Clear();
+                            enterDescription.SendKeys(description);
+                        }
+                        Thread.Sleep(1000);
+                        var updateChange = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/button[1]"));
+                        status =(updateChange != null);
+                        if (status)
+                        {
+                            updateChange.Click();
+                        }
+                    } 
+                }
+
             }
+            catch(Exception ex)
+            {
+                Assert.IsFalse(status);
+                driver.Close();
+                driver.Quit();
+            }
+            Assert.IsTrue(status);
+            driver.Close();
+        }
+
+
+        [TestCleanup]
+        public void clear()
+        {
+            driver.Quit();
         }
     }
 }

@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\do_an"
+    "\\do_an",
+    "\\do_an\\CRUD_test"
   ],
-  "SelectedNode": "\\do_an\\do_an.csproj",
+  "SelectedNode": "\\do_an\\CRUD_test\\product.cs",
   "PreviewInSolutionExplorer": false
 }

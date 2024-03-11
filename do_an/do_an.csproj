@@ -59,6 +59,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CRUD_data\Category\create.cs" />
+    <Compile Include="CRUD_data\Category\update.cs" />
     <Compile Include="CRUD_data\Product\delete.cs" />
     <Compile Include="CRUD_test\product.cs" />
     <Compile Include="CRUD_data\Product\createProduct.cs" />
