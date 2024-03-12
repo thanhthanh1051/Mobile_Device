@@ -8,6 +8,6 @@ namespace do_an.CRUD_data.Category.delete
 {
     public static class Consts
     {
-        public const string name = "";
+        public const string name = "IPad";
     }
 }

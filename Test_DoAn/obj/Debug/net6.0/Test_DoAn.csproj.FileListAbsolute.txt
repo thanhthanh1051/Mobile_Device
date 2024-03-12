@@ -1,0 +1,15 @@
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\bin\Debug\net6.0\Test_DoAn.deps.json
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\bin\Debug\net6.0\Test_DoAn.runtimeconfig.json
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\bin\Debug\net6.0\Test_DoAn.dll
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\bin\Debug\net6.0\Test_DoAn.pdb
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.csproj.AssemblyReference.cache
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.GeneratedMSBuildEditorConfig.editorconfig
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.AssemblyInfoInputs.cache
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.AssemblyInfo.cs
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.csproj.CoreCompileInputs.cache
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.sourcelink.json
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.dll
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\refint\Test_DoAn.dll
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.pdb
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\Test_DoAn.genruntimeconfig.cache
+D:\Baodamchatluong_TH\DO_AN\do_an\Test_DoAn\obj\Debug\net6.0\ref\Test_DoAn.dll

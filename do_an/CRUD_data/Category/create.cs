@@ -8,7 +8,7 @@ namespace do_an.CRUD_data.Category.create
 {
     public static class Consts
     {
-        public const string name = "Laptop";
-        public const string description = "Laptopp";
+        public const string name = "Computer";
+        public const string description = "Computer";
     }
 }

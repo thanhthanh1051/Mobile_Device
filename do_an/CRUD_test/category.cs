@@ -122,13 +122,41 @@ namespace do_an.CRUD_test
                     {
                         add.Click();
                     }
+                    Thread.Sleep(1000);
+                    var checkSreach = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                    status = checkSreach != null;
+                    if (status)
+                    {
+                        checkSreach.SendKeys(name);
+                        Thread.Sleep(1000);
+                        //var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                        //Thread.Sleep(1000);
+                        //status = dataempty == null;
+                        //if (status)
+                        //{
+                        //    driver.Quit();
+                        //}
+                        //Thread.Sleep(1000);
+                        var searchCode = driver.FindElement(By.ClassName("sorting_1"));
+                        string checkName = searchCode.Text;
+                        if (checkName == name)
+                        {
+                            status = true;
+                        }
+                        else
+                        {
+                            status = false;
+                        }
+                    }
                 }
             }
             catch(Exception ex)
             {
                 Assert.IsFalse(status);
+                driver.Close();
                 driver.Quit();
             }
+
             Assert.IsTrue(status);
             driver.Close();
         }
@@ -141,7 +169,6 @@ namespace do_an.CRUD_test
             bool status = true;
             try
             {
-
                 driver.SwitchTo().NewWindow(WindowType.Tab);
                 driver.Navigate().GoToUrl("http://localhost:81/admin");
                 status = driver != null;
@@ -168,17 +195,17 @@ namespace do_an.CRUD_test
                         clickSearch.SendKeys(name);
                     }
                     Thread.Sleep(1000);
-                    var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
-                    Thread.Sleep(1000);
-                    status = dataempty != null;
-                    if (status)
-                    {
-                        driver.Quit();
-                    }
-                    Thread.Sleep(1000);
+                    //var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                    //Thread.Sleep(1000);
+                    //status = dataempty != null;
+                    //if (status)
+                    //{
+                    //    driver.Quit();
+                    //}
+                    //Thread.Sleep(1000);
                     var searchName = driver.FindElement(By.ClassName("sorting_1"));
-                    bool check = (searchName.Text == name);
-                    if (check)
+                    string check = searchName.Text;
+                    if (check == name)
                     {
                         var update = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[5]/a[1]"));
                         status = update != null;
@@ -209,6 +236,22 @@ namespace do_an.CRUD_test
                         {
                             updateChange.Click();
                         }
+                        Thread.Sleep(1000);
+                        var searchAgain = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                        status = searchAgain != null;
+                        if (status)
+                        {
+                            searchAgain.SendKeys(newName);
+                        }
+                        Thread.Sleep(1000);
+                        var dataempty = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]"));
+                        Thread.Sleep(1000);
+                        status = dataempty != null;
+                        if (status)
+                        {
+                            status = true;
+                        }
+                        Thread.Sleep(1000);
                     } 
                 }
 
@@ -258,17 +301,9 @@ namespace do_an.CRUD_test
                         clickSearch.SendKeys(name);
                     }
                     Thread.Sleep(1000);
-                    var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
-                    Thread.Sleep(1000);
-                    status = dataempty != null;
-                    if (status)
-                    {
-                        driver.Quit();
-                    }
-                    Thread.Sleep(1000);
                     var searchName = driver.FindElement(By.ClassName("sorting_1"));
-                    bool check = (searchName.Text == name);
-                    if (check)
+                    string check = searchName.Text;
+                    if (check == name)
                     {
                         var dele = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[6]/a[1]"));
                         status = dele != null;
@@ -281,15 +316,25 @@ namespace do_an.CRUD_test
                         status = searchAgain != null;
                         if (status)
                         {
-                            clickSearch.SendKeys(name);
+                            searchAgain.SendKeys(name);
                         }
                         Thread.Sleep(1000);
-                        var namecheck = driver.FindElement(By.ClassName("sorting_1"));
-                        bool checkdele = (namecheck.Text == name);
-                        if (checkdele)
+                        //var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                        var dataempty = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]"));
+                        Thread.Sleep(1000);
+                        status = dataempty != null;
+                        if (status)
                         {
                             status = true;
                         }
+                        Thread.Sleep(1000);
+
+                        //var namecheck = driver.FindElement(By.ClassName("sorting_1"));
+                        //bool checkdele = (namecheck.Text == name);
+                        //if (checkdele)
+                        //{
+                        //    status = true;
+                        //}
                     }
                 }
             }

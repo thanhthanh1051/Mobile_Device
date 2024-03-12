@@ -8,8 +8,8 @@ namespace do_an.CRUD_data.Category.update
 {
     public static class Consts
     {
-        public const string name = "Laptop";
-        public const string description = "Laptopp";
-        public const string newName = "Laptopp";
+        public const string name = "Computer";
+        public const string description = "IPadd";
+        public const string newName = "IPad";
     }
 }
