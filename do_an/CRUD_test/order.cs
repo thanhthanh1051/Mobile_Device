@@ -110,7 +110,13 @@ namespace do_an.CRUD_test
                         clickStatus.Click();
                     }
                     Thread.Sleep(1000);
-                   
+                    var update = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/button[1]"));
+                    status = update != null;
+                    if (status)
+                    {
+                        update.Click();
+                    }
+                    Thread.Sleep(1000);
                 }
                }
             catch(Exception ex)

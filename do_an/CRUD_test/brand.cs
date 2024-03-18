@@ -1,8 +1,18 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
 using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System.Threading;
+using System.Net.Configuration;
+using System.Collections.Generic;
+using Microsoft.Office.Interop.Excel;
+using OpenQA.Selenium.Support.UI;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using OfficeOpenXml;
+using System.IO;
+using Newtonsoft.Json;
+
 
 namespace do_an.CRUD_test
 {
@@ -10,10 +20,13 @@ namespace do_an.CRUD_test
     public class brand
     {
         IWebDriver driver = new ChromeDriver();
+        string fNumber = null;
+        string sNumber = null;
+        string f1Number = null;
+        string f2Number = null;
         [TestInitialize]
         public void Test_Login()
         {
-
             bool status = true;
             try
             {
@@ -25,6 +38,9 @@ namespace do_an.CRUD_test
                 status = driver != null;
                 if (status)
                 {
+                    //string excelFilePath = @"D:\BaoDamChatLuong\Test-case-NhomB15.xls";
+                    //ReadFileExel(excelFilePath);
+
                     Thread.Sleep(2000);
                     var iconLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[3]/div[1]/a[1]/div[1]/span[1]"));
                     Thread.Sleep(1000);
@@ -67,7 +83,6 @@ namespace do_an.CRUD_test
             }
             Assert.IsTrue(status);
         }
-
         [TestMethod]
         [DataTestMethod]
         [DataRow(CRUD_data.Brand.create.Consts.name, CRUD_data.Brand.create.Consts.description)]
@@ -145,8 +160,6 @@ namespace do_an.CRUD_test
             Assert.IsTrue(status);
             driver.Close();
         }
-
-
         [TestMethod]
         [DataTestMethod]
         [DataRow(CRUD_data.Brand.update.Consts.name, CRUD_data.Brand.update.Consts.description, CRUD_data.Brand.update.Consts.newName)]
@@ -318,10 +331,127 @@ namespace do_an.CRUD_test
             driver.Close();
         }
 
+        //void ReadFileExel(string filePath)
+        //{
+        //    // Đọc dữ liệu từ các ô trong worksheet
+        //    Microsoft.Office.Interop.Excel.Application excelApp = new Microsoft.Office.Interop.Excel.Application();
+
+        //    Microsoft.Office.Interop.Excel.Workbook workbook = excelApp.Workbooks.Open(filePath);
+
+        //    Microsoft.Office.Interop.Excel._Worksheet worksheet = workbook.Sheets[1];
+        //    Microsoft.Office.Interop.Excel.Range range = worksheet.UsedRange;
+
+        //    for (int row = 2; row <= range.Rows.Count; row++)
+        //    {
+        //        for (int col = 1; col <= range.Columns.Count; col++)
+        //        {
+        //            if(row == 3)
+        //            {
+        //                if(col >= 2)
+        //                {
+        //                    string cellValue = range.Cells[row, col].Value2?.ToString();
+        //                    if (cellValue != null)
+        //                    {
+        //                        if (col == 2)
+        //                        {
+        //                            fNumber = cellValue;
+        //                        }
+        //                        else if(col == 3)
+        //                        {
+        //                            f1Number = cellValue;
+        //                        }
+        //                        else if(col == 4)
+        //                        {
+        //                            f2Number = cellValue;
+        //                        }
+        //                        else
+        //                        {
+        //                            sNumber = cellValue;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    workbook.Close();
+        //    excelApp.Quit();
+        //}
+
+        //static void WriteToColumnC(string filePath, Boolean result)
+        //{
+        //    Microsoft.Office.Interop.Excel.Application excelApp = new Microsoft.Office.Interop.Excel.Application();
+        //    Microsoft.Office.Interop.Excel.Workbook workbook = excelApp.Workbooks.Open(filePath);
+        //    Microsoft.Office.Interop.Excel._Worksheet worksheet = workbook.Sheets[1];
+        //    Microsoft.Office.Interop.Excel.Range range = worksheet.UsedRange;
+        //    for (int row = 2; row <= range.Rows.Count; row++)
+        //    {
+        //        // Lấy giá trị từ ô đầu tiên
+
+        //        if (result)
+        //        {
+        //            // Ghi giá trị chuỗi cộng vào cột thứ 3 (cột C)
+        //            range.Cells[3, 9].Value2 = "Passed";
+        //        }
+        //        else
+        //        {
+        //            range.Cells[3, 9].Value2 = "Failed";
+        //        }
+        //    }
+        //    workbook.Close();
+        //    excelApp.Quit();
+        //}
         [TestCleanup]
         public void clear()
         {
             driver.Quit();
         }
+
+        //[DynamicData(nameof(GetLoginCredentialsFromExcel), DynamicDataSourceType.Method)]
+        //private static IEnumerable<object[]> GetLoginCredentialsFromExcel()
+        //{
+        //    string filePath = @"D:\Huflit\Năm 3\Học kì 2\Bảo đảm chất lượng phần mềm\Data\dataTH.xlsx";
+        //    using (var package = new ExcelPackage(new FileInfo(filePath)))
+        //    {
+        //        var worksheet = package.Workbook.Worksheets[0];
+        //        int rowCount = worksheet.Dimension.Rows;
+
+        //        for (int row = 4; row <= rowCount; row++)
+        //        {
+        //            string name = worksheet.Cells[row, 1].Value.ToString();
+        //            string email = worksheet.Cells[row, 2].Value.ToString();
+        //            string subject = worksheet.Cells[row, 3].Value.ToString();
+        //            string message = worksheet.Cells[row, 4].Value.ToString();
+        //            yield return new string[] { name, email, subject, message };
+        //        }
+        //    }
+        //}
+
+        //private void UpdateExcelResult(string name, string email, string subject, string message, string result)
+        //{
+        //    string filePath = @"D:\Huflit\Năm 3\Học kì 2\Bảo đảm chất lượng phần mềm\Data\dataTH.xlsx";
+        //    FileInfo file = new FileInfo(filePath);
+
+        //    using (ExcelPackage package = new ExcelPackage(file))
+        //    {
+        //        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+        //        int rowCount = worksheet.Dimension.Rows;
+
+        //        for (int row = 4; row <= rowCount; row++)
+        //        {
+        //            string Name = worksheet.Cells[row, 1].Value.ToString();
+        //            string Email = worksheet.Cells[row, 2].Value.ToString();
+        //            string Subject = worksheet.Cells[row, 3].Value.ToString();
+        //            string Message = worksheet.Cells[row, 4].Value.ToString();
+
+        //            if (Name == name && Email == email && Subject == subject && Message == message)
+        //            {
+        //                worksheet.Cells[row, 5].Value = result;
+        //                break;
+        //            }
+        //        }
+        //        package.Save();
+        //    }
+        //}
     }
 }

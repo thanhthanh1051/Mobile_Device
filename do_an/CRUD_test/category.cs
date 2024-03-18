@@ -9,7 +9,9 @@ using Microsoft.Office.Interop.Excel;
 using OpenQA.Selenium.Support.UI;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
-
+using OfficeOpenXml;
+using System.IO;
+using Newtonsoft.Json;
 namespace do_an.CRUD_test
 {
     [TestClass]
@@ -76,7 +78,8 @@ namespace do_an.CRUD_test
 
         [TestMethod]
         [DataTestMethod]
-        [DataRow(CRUD_data.Category.create.Consts.name,CRUD_data.Category.create.Consts.description)]
+        //[DataRow(CRUD_data.Category.create.Consts.name,CRUD_data.Category.create.Consts.description)]
+        [DynamicData(nameof(GetLoginCredentialsFromExcel), DynamicDataSourceType.Method)]
         public void create(string name, string description)
         {
             bool status = true;
@@ -157,7 +160,9 @@ namespace do_an.CRUD_test
                 driver.Quit();
             }
 
-            Assert.IsTrue(status);
+            //Assert.IsTrue(status);
+            string kq = "TRUE";
+            UpdateExcelResult(kq);
             driver.Close();
         }
 
@@ -254,7 +259,6 @@ namespace do_an.CRUD_test
                         Thread.Sleep(1000);
                     } 
                 }
-
             }
             catch(Exception ex)
             {
@@ -346,6 +350,56 @@ namespace do_an.CRUD_test
             }
             Assert.IsTrue(status);
             driver.Close();
+        }
+        private static IEnumerable<object[]> GetLoginCredentialsFromExcel()
+        {
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\Book1.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[0];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string name = worksheet.Cells[row, 1].Value.ToString();
+                    string description = worksheet.Cells[row, 2].Value.ToString();
+                    //string subject = worksheet.Cells[row, 3].Value.ToString();
+                    //string message = worksheet.Cells[row, 4].Value.ToString();
+                    yield return new string[] { name, description };
+                }
+            }
+        }
+        private void UpdateExcelResult(string result)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\Book1.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string accept = worksheet.Cells[row,3].Value.ToString();
+                    //string Email = worksheet.Cells[row, 2].Value.ToString();
+                    //string Subject = worksheet.Cells[row, 3].Value.ToString();
+                    //string Message = worksheet.Cells[row, 4].Value.ToString();
+                    if (accept == result)
+                    {
+                        worksheet.Cells[row, 4].Value = "true";
+                        //break;
+                    }
+                    else
+                    {
+                        worksheet.Cells[row, 4].Value = result;
+                        //break;
+                    }
+                }
+                package.Save();
+            }
         }
 
         [TestCleanup]

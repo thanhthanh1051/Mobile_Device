@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\do_an",
+    "\\do_an\\CRUD_data",
+    "\\do_an\\CRUD_data\\Product",
     "\\do_an\\CRUD_test"
   ],
-  "SelectedNode": "\\do_an\\CRUD_test\\order.cs",
+  "SelectedNode": "\\do_an\\CRUD_test\\category.cs",
   "PreviewInSolutionExplorer": false
 }
