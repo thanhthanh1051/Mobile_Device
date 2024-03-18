@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using OfficeOpenXml;
 using System.IO;
 using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.Excel.Functions;
 namespace do_an.CRUD_test
 {
     [TestClass]
@@ -80,8 +81,10 @@ namespace do_an.CRUD_test
         [DataTestMethod]
         //[DataRow(CRUD_data.Category.create.Consts.name,CRUD_data.Category.create.Consts.description)]
         [DynamicData(nameof(GetLoginCredentialsFromExcel), DynamicDataSourceType.Method)]
-        public void create(string name, string description)
+        public void create(string name, string description, string expect)
         {
+            string actual_result = "";
+            string result = "";
             bool status = true;
             try
             {
@@ -132,24 +135,26 @@ namespace do_an.CRUD_test
                     {
                         checkSreach.SendKeys(name);
                         Thread.Sleep(1000);
-                        //var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
-                        //Thread.Sleep(1000);
-                        //status = dataempty == null;
-                        //if (status)
-                        //{
-                        //    driver.Quit();
-                        //}
-                        //Thread.Sleep(1000);
                         var searchCode = driver.FindElement(By.ClassName("sorting_1"));
                         string checkName = searchCode.Text;
-                        if (checkName == name)
+                        if (checkName == expect)
                         {
+                            actual_result = checkName;
+                            result = "Pass";
                             status = true;
                         }
                         else
                         {
+                            actual_result = checkName;
+                            result = "Faild";
                             status = false;
                         }
+                    }
+                    else
+                    {
+                        actual_result = "";
+                        result = "Faild";
+                        status = false;
                     }
                 }
             }
@@ -161,8 +166,7 @@ namespace do_an.CRUD_test
             }
 
             //Assert.IsTrue(status);
-            string kq = "TRUE";
-            UpdateExcelResult(kq);
+            UpdateExcelResult(actual_result, result);
             driver.Close();
         }
 
@@ -363,13 +367,12 @@ namespace do_an.CRUD_test
                 {
                     string name = worksheet.Cells[row, 1].Value.ToString();
                     string description = worksheet.Cells[row, 2].Value.ToString();
-                    //string subject = worksheet.Cells[row, 3].Value.ToString();
-                    //string message = worksheet.Cells[row, 4].Value.ToString();
-                    yield return new string[] { name, description };
+                    string expect = worksheet.Cells[row, 3].Value.ToString();
+                    yield return new string[] { name, description, expect };
                 }
             }
         }
-        private void UpdateExcelResult(string result)
+        private void UpdateExcelResult(string actual_result, string result)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             string filePath = @"D:\Baodamchatluong_TH\DO_AN\Book1.xlsx";
@@ -383,25 +386,12 @@ namespace do_an.CRUD_test
 
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    string accept = worksheet.Cells[row,3].Value.ToString();
-                    //string Email = worksheet.Cells[row, 2].Value.ToString();
-                    //string Subject = worksheet.Cells[row, 3].Value.ToString();
-                    //string Message = worksheet.Cells[row, 4].Value.ToString();
-                    if (accept == result)
-                    {
-                        worksheet.Cells[row, 4].Value = "true";
-                        //break;
-                    }
-                    else
-                    {
-                        worksheet.Cells[row, 4].Value = result;
-                        //break;
-                    }
+                   worksheet.Cells[row, 4].Value = actual_result;
+                   worksheet.Cells[row, 5].Value = result;
                 }
                 package.Save();
             }
         }
-
         [TestCleanup]
         public void clear()
         {

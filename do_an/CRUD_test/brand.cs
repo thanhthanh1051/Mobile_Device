@@ -38,9 +38,6 @@ namespace do_an.CRUD_test
                 status = driver != null;
                 if (status)
                 {
-                    //string excelFilePath = @"D:\BaoDamChatLuong\Test-case-NhomB15.xls";
-                    //ReadFileExel(excelFilePath);
-
                     Thread.Sleep(2000);
                     var iconLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/header[1]/div[1]/div[1]/div[1]/div[3]/div[1]/a[1]/div[1]/span[1]"));
                     Thread.Sleep(1000);
