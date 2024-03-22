@@ -115,6 +115,7 @@
     <Compile Include="CRUD_test\brand.cs" />
     <Compile Include="CRUD_test\order.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuanLyDonHang\QuanLyDonHang.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

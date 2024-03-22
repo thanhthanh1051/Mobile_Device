@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using Microsoft.Office.Interop.Excel;
 using OpenQA.Selenium.Support.UI;
 using System.Net.NetworkInformation;
+using OfficeOpenXml;
+using System.IO;
 namespace do_an.CRUD_test
 {
     [TestClass]
@@ -15,20 +17,22 @@ namespace do_an.CRUD_test
     {
         IWebDriver driver = new ChromeDriver();
         [TestInitialize]
-        //[DataTestMethod]
-        //[DataRow(CRUD_data.login.Consts.email, CRUD_data.login.Consts.password)]
-        public void Test_Login()
+        public void Init()
         {
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(1000);
 
+            driver.Url = "http://localhost:81/";
+            driver.Navigate();
+            Thread.Sleep(1000);
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(1000);
+        }
+        public void Login(string email, string password)
+        {
             bool status = true;
             try
             {
-                driver.Manage().Window.Maximize();
-                Thread.Sleep(1000);
-
-                driver.Url = "http://localhost:81/";
-                driver.Navigate();
-                status = driver != null;
                 if (status)
                 {
                     Thread.Sleep(2000);
@@ -45,7 +49,7 @@ namespace do_an.CRUD_test
                     status = enterEmail != null;
                     if (status)
                     {
-                        enterEmail.SendKeys("admin123@gmail.com");
+                        enterEmail.SendKeys(email);
                     }
                     Thread.Sleep(2000);
                     var enterPassword = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/input[2]"));
@@ -53,7 +57,7 @@ namespace do_an.CRUD_test
                     status = enterPassword != null;
                     if (status)
                     {
-                        enterPassword.SendKeys("admin123");
+                        enterPassword.SendKeys(password);
                     }
                     Thread.Sleep(2000);
                     var clickLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/button[1]"));
@@ -71,24 +75,34 @@ namespace do_an.CRUD_test
                 Assert.IsFalse(status);
                 driver.Quit();
             }
-            Assert.IsTrue(status);
+        }
+        public void Logout()
+        {
+            driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[1]/div/div[3]/div/a[1]/div/span[1]")).Click();
+            driver.FindElement(By.XPath("/html/body/div[1]/div[2]/div/div/div[2]/div[1]/div[2]/form/div/a")).Click();
+            Thread.Sleep(3000);
         }
 
         [TestMethod]
         [DataTestMethod]
-        [DataRow(CRUD_data.Product.createProduct.Consts.code,
-            CRUD_data.Product.createProduct.Consts.name,
-            CRUD_data.Product.createProduct.Consts.amount,
-            CRUD_data.Product.createProduct.Consts.image,
-            CRUD_data.Product.createProduct.Consts.category,
-            CRUD_data.Product.createProduct.Consts.brand,
-            CRUD_data.Product.createProduct.Consts.priceSell,
-            CRUD_data.Product.createProduct.Consts.priceBuy,
-            CRUD_data.Product.createProduct.Consts.storage
-            )]
-        public void CreateProduct(string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy,string storage)
+        //[DataRow(CRUD_data.Product.createProduct.Consts.code,
+        //    CRUD_data.Product.createProduct.Consts.name,
+        //    CRUD_data.Product.createProduct.Consts.amount,
+        //    CRUD_data.Product.createProduct.Consts.image,
+        //    CRUD_data.Product.createProduct.Consts.category,
+        //    CRUD_data.Product.createProduct.Consts.brand,
+        //    CRUD_data.Product.createProduct.Consts.priceSell,
+        //    CRUD_data.Product.createProduct.Consts.priceBuy,
+        //    CRUD_data.Product.createProduct.Consts.storage
+        //    )]
+        [DynamicData(nameof(GetAddProductCredentialsFromExcel), DynamicDataSourceType.Method)]
+        public void CreateProduct(string email, string password, string code, string name, string amount, string image, string color, string category, string brand, string priceSell, string priceBuy,string storage, string rowValue)
         {
-             bool status = true;
+            int row = int.Parse(rowValue);
+            string actual_result = "";
+            Login(email, password);
+            Thread.Sleep(1000);
+            bool status = true;
             try
             {
                 driver.SwitchTo().NewWindow(WindowType.Tab);
@@ -138,10 +152,18 @@ namespace do_an.CRUD_test
                     Thread.Sleep(2000);
                     var addimage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[7]/input[1]"));
                     Thread.Sleep(1000);
-                    status = image != null;
+                    status = addimage != null;
                     if (status)
                     {
                         addimage.SendKeys(image);
+                    }
+                    Thread.Sleep(2000);
+                    var addcolor = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[9]/input[1]"));
+                    Thread.Sleep(1000);
+                    status = addcolor != null;
+                    if (status)
+                    {
+                        addcolor.SendKeys(color);
                     }
                     Thread.Sleep(2000);
                     var selectCate = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[2]/select[1]"));
@@ -195,50 +217,73 @@ namespace do_an.CRUD_test
                     {
                         create.Click();
                     }
-                    Thread.Sleep(2000);
                 }
                 Thread.Sleep(2000);
             }
             catch (Exception ex)
             {
-                Assert.Fail(ex.Message);
-                driver.Quit();
-            }
-
-            try
-            {
-                if (status)
+                string validateCode= driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateCode != null)
                 {
-                    var search = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
-                    Thread.Sleep(1000);
-                    status = search != null;
-                    if (status)
-                    {
-                        search.SendKeys("ip12");
-                        Thread.Sleep(1000);
-                        var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
-                        Thread.Sleep(1000);
-                        status = dataempty == null;
-                        if (!status)
-                        {
-                            driver.Quit();
-                        }
-                        Thread.Sleep(1000);
-                        var searchCode = driver.FindElement(By.ClassName("sorting_1"));
-                        bool check = (searchCode.Text == "ip12");
-                        if (!check)
-                        {
-                            driver.Quit();
-                        }
-                    }
+                    actual_result = validateCode;
                 }
+                Thread.Sleep(1000);
+                string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateName != null)
+                {
+                    actual_result = validateName;
+                }
+                Thread.Sleep(1000);
+                string validateImage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateImage != null)
+                {
+                    actual_result = validateImage;
+                }
+                Thread.Sleep(1000);
+                string validateAmount = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateAmount != null)
+                {
+                    actual_result = validateAmount;
+                }
+                Thread.Sleep(1000);
+                string validateColor = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateColor != null)
+                {
+                    actual_result = validateColor;
+                }
+                Thread.Sleep(1000);
+                string validateCategory = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateCategory != null)
+                {
+                    actual_result = validateCategory;
+                }
+                Thread.Sleep(1000);
+                string validateBrand = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateBrand != null)
+                {
+                    actual_result = validateBrand;
+                }
+                Thread.Sleep(1000);
+                string validatePriceBuy = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validatePriceBuy != null)
+                {
+                    actual_result = validatePriceBuy;
+                }
+                Thread.Sleep(1000);
+                string validatePriceSell = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validatePriceSell != null)
+                {
+                    actual_result = validatePriceSell;
+                }
+                Thread.Sleep(1000);
+                string validateStorage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateStorage != null)
+                {
+                    actual_result = validateStorage;
+                }
+                Thread.Sleep(1000);
             }
-            catch (Exception ex)
-            {
-                driver.Quit();
-            }
-            Assert.IsTrue(status);
-            driver.Close();
+            AddProductExcelResult(actual_result, row);
         }
 
         [TestMethod]
@@ -253,8 +298,13 @@ namespace do_an.CRUD_test
             CRUD_data.Product.createProduct.Consts.priceBuy,
             CRUD_data.Product.createProduct.Consts.storage
             )]
-        public void UpdateProduct(string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy,string storage)
+        [DynamicData(nameof(GetUpdateProductCredentialsFromExcel), DynamicDataSourceType.Method)]
+        public void UpdateProduct(string email, string password, string code, string name, string amount, string image, string category, string brand, string priceSell, string priceBuy, string storage, string rowValue)
         {
+            int row = int.Parse(rowValue);
+            string actual_result = "";
+            Login(email, password);
+            Thread.Sleep(1000);
             bool status = true;
             try
             {
@@ -286,7 +336,7 @@ namespace do_an.CRUD_test
                         Thread.Sleep(1000);
                         var clickCode = driver.FindElement(By.Name("code"));
                         status = clickCode != null;
-                        if(status)
+                        if (status)
                         {
                             clickCode.Clear();
                             clickCode.SendKeys(code);
@@ -331,60 +381,112 @@ namespace do_an.CRUD_test
                             up.Click();
                         }
                         Thread.Sleep(2000);
-                    }
-                    else
-                    {
-                        Assert.Fail();
-                        driver.Quit();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                driver.Quit();
-            }
-
-            try
-            {
-                if (status)
-                {
-                    var search = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
-                    Thread.Sleep(1000);
-                    status = search != null;
-                    if (status)
-                    {
-                        search.SendKeys("ip12");
+                        var search = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
                         Thread.Sleep(1000);
-                        var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
-                        Thread.Sleep(1000);
-                        status = dataempty != null;
+                        status = search != null;
                         if (status)
                         {
-                            driver.Quit();
-                        }
-                        Thread.Sleep(1000);
-                        var searchCode = driver.FindElement(By.ClassName("sorting_1"));
-                        bool check = (searchCode.Text == "ip12");
-                        if (!check)
-                        {
-                            driver.Quit();
+                            search.SendKeys(name);
+                            try
+                            {
+                                Thread.Sleep(1000);
+                                var searchCode = driver.FindElement(By.ClassName("sorting_1"));
+                                status = searchCode != null;
+                                if (status)
+                                {
+                                    actual_result = searchCode.Text;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                                Thread.Sleep(1000);
+                                status = dataempty == null;
+                                if (!status)
+                                {
+                                    actual_result = dataempty.Text;
+                                }
+                                Thread.Sleep(1000);
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
+            }catch(Exception ex)
             {
-                driver.Quit();
+                string validateCode = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateCode != null)
+                {
+                    actual_result = validateCode;
+                }
+                Thread.Sleep(1000);
+                string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateName != null)
+                {
+                    actual_result = validateName;
+                }
+                Thread.Sleep(1000);
+                string validateImage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateImage != null)
+                {
+                    actual_result = validateImage;
+                }
+                Thread.Sleep(1000);
+                string validateAmount = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateAmount != null)
+                {
+                    actual_result = validateAmount;
+                }
+                Thread.Sleep(1000);
+                string validateColor = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateColor != null)
+                {
+                    actual_result = validateColor;
+                }
+                Thread.Sleep(1000);
+                string validateCategory = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateCategory != null)
+                {
+                    actual_result = validateCategory;
+                }
+                Thread.Sleep(1000);
+                string validateBrand = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateBrand != null)
+                {
+                    actual_result = validateBrand;
+                }
+                Thread.Sleep(1000);
+                string validatePriceBuy = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validatePriceBuy != null)
+                {
+                    actual_result = validatePriceBuy;
+                }
+                Thread.Sleep(1000);
+                string validatePriceSell = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validatePriceSell != null)
+                {
+                    actual_result = validatePriceSell;
+                }
+                Thread.Sleep(1000);
+                string validateStorage = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateStorage != null)
+                {
+                    actual_result = validateStorage;
+                }
+                Thread.Sleep(1000);
             }
-            Assert.IsTrue(status);
-            driver.Close();
+            UpdateProductExcelResult(actual_result, row);
         }
+        
 
         [TestMethod]
         [DataTestMethod]
         [DataRow(CRUD_data.Product.delete.Consts.code)]
-        public void DeleteProduct(string code)
+        public void DeleteProduct(string email, string password, string code, string rowValue)
         {
+            int row = int.Parse(rowValue);
+            string actual_result = "";
+            Login(email, password);
+            Thread.Sleep(1000);
             bool status = true;
             try
             {
@@ -433,22 +535,21 @@ namespace do_an.CRUD_test
                         search.SendKeys(code);
                     }
                     Thread.Sleep(1000);
-                    var checkItem = driver.FindElement(By.Id("sorting_1"));
-                    status = checkItem == null;
-                    if(status == false)
+                    var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                    Thread.Sleep(1000);
+                    status = dataempty == null;
+                    if (!status)
                     {
-                        status = true;
+                        actual_result = dataempty.Text;
                     }
+                    Thread.Sleep(1000);
                 }
             }
             catch (Exception ex)
             {
-                Assert.Fail(ex.Message);
-                driver.Close();
                 driver.Quit ();
             }
-            Assert.IsTrue(status);
-            driver.Close();
+            DeleteProductExcelResult(actual_result, row);
         }
 
         [TestCleanup]
@@ -456,6 +557,174 @@ namespace do_an.CRUD_test
         {
             //driver.Close();
             driver.Quit();
+        }
+        private static IEnumerable<object[]> GetAddProductCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[9];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueCode = worksheet.Cells[row, 5].Value;
+                    string code = cellValueCode != null ? cellValueCode.ToString() : string.Empty;
+                    object cellValueName = worksheet.Cells[row, 6].Value;
+                    string name = cellValueName != null ? cellValueName.ToString() : string.Empty;
+                    object cellValueImage = worksheet.Cells[row, 7].Value;
+                    string image = cellValueImage != null ? cellValueImage.ToString() : string.Empty;
+                    object cellValueAmount = worksheet.Cells[row, 8].Value;
+                    string amount = cellValueAmount != null ? cellValueAmount.ToString() : string.Empty;
+                    object cellValueColor = worksheet.Cells[row, 8].Value;
+                    string color = cellValueColor != null ? cellValueColor.ToString() : string.Empty;
+                    object cellValueCategory = worksheet.Cells[row, 9].Value;
+                    string category = cellValueCategory != null ? cellValueCategory.ToString() : string.Empty;
+                    object cellValueBrand = worksheet.Cells[row, 10].Value;
+                    string brand = cellValueBrand != null ? cellValueBrand.ToString() : string.Empty;
+                    object cellValuePriceBuy = worksheet.Cells[row, 11].Value;
+                    string price_Buy = cellValuePriceBuy != null ? cellValuePriceBuy.ToString() : string.Empty;
+                    object cellValuePriceSell = worksheet.Cells[row, 12].Value;
+                    string price_Sell = cellValuePriceSell != null ? cellValuePriceSell.ToString() : string.Empty;
+                    object cellValueStorage = worksheet.Cells[row, 13].Value;
+                    string storage = cellValueStorage != null ? cellValueStorage.ToString() : string.Empty;
+                    yield return new string[] { email, password, code, name, amount, image, color, category, brand, price_Buy, price_Sell, storage , rowValue };
+                }
+            }
+        }
+        private void AddProductExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[9];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 14].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 15].Value = actual_result;
+                    worksheet.Cells[row, 16].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 15].Value = actual_result;
+                    worksheet.Cells[row, 16].Value = "Faild";
+                }
+                package.Save();
+            }
+        }
+        private static IEnumerable<object[]> GetUpdateProductCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[9];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueCode = worksheet.Cells[row, 5].Value;
+                    string code = cellValueCode != null ? cellValueCode.ToString() : string.Empty;
+                    object cellValueName = worksheet.Cells[row, 6].Value;
+                    string name = cellValueName != null ? cellValueName.ToString() : string.Empty;
+                    object cellValueNewName = worksheet.Cells[row, 7].Value;
+                    string newname = cellValueNewName != null ? cellValueNewName.ToString() : string.Empty;
+                    object cellValueImage = worksheet.Cells[row, 8].Value;
+                    string image = cellValueImage != null ? cellValueImage.ToString() : string.Empty;
+                    object cellValueAmount = worksheet.Cells[row, 9].Value;
+                    string amount = cellValueAmount != null ? cellValueAmount.ToString() : string.Empty;
+                    object cellValueCategory = worksheet.Cells[row, 10].Value;
+                    string category = cellValueCategory != null ? cellValueCategory.ToString() : string.Empty;
+                    object cellValueBrand = worksheet.Cells[row, 11].Value;
+                    string brand = cellValueBrand != null ? cellValueBrand.ToString() : string.Empty;
+                    object cellValuePriceBuy = worksheet.Cells[row, 12].Value;
+                    string price_Buy = cellValuePriceBuy != null ? cellValuePriceBuy.ToString() : string.Empty;
+                    object cellValuePriceSell = worksheet.Cells[row, 13].Value;
+                    string price_Sell = cellValuePriceSell != null ? cellValuePriceSell.ToString() : string.Empty;
+                    object cellValueStorage = worksheet.Cells[row, 14].Value;
+                    string storage = cellValueStorage != null ? cellValueStorage.ToString() : string.Empty;
+                    yield return new string[] { email, password, code, name, image, amount, category, brand, price_Buy, price_Sell, storage, rowValue };
+                }
+            }
+        }
+        private void UpdateProductExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[9];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 15].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 16].Value = actual_result;
+                    worksheet.Cells[row, 17].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 16].Value = actual_result;
+                    worksheet.Cells[row, 17].Value = "Faild";
+                }
+                package.Save();
+            }
+        }
+        private static IEnumerable<object[]> GetDeleteProductCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[10];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueCode = worksheet.Cells[row, 5].Value;
+                    string code = cellValueCode != null ? cellValueCode.ToString() : string.Empty;
+                    yield return new string[] { email, password, code, rowValue };
+                }
+            }
+        }
+        private void DeleteProductExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[10];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 6].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 7].Value = actual_result;
+                    worksheet.Cells[row, 8].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 7].Value = actual_result;
+                    worksheet.Cells[row, 8].Value = "Faild";
+                }
+                package.Save();
+            }
         }
     }
 }

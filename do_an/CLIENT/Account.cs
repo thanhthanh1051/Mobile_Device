@@ -95,8 +95,6 @@ namespace do_an.CLIENT
             string actual_result = "";
             string result = "";
             Login(email, password);
-           
-
             string user_name = driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[2]/div/div/div[3]")).Text;
                 if (user_name == expect)
                 {
@@ -195,7 +193,7 @@ namespace do_an.CLIENT
         [TestMethod]
         [DataTestMethod]
         [DynamicData(nameof(GetLogOutCredentialsFromExcel), DynamicDataSourceType.Method)]
-        public void Logout(string name, string email, string password,string expect)
+        public void Logout(string name, string email, string password,string expect) 
         {
             string actual_result = "";
             string result = "";

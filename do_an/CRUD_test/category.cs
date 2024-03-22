@@ -20,18 +20,22 @@ namespace do_an.CRUD_test
     {
         IWebDriver driver = new ChromeDriver();
         [TestInitialize]
-        public void Test_Login()
+        public void Init()
         {
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(1000);
 
+            driver.Url = "http://localhost:81/";
+            driver.Navigate();
+            Thread.Sleep(1000);
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(1000);
+        }
+        public void Login(string email, string password)
+        {
             bool status = true;
             try
             {
-                driver.Manage().Window.Maximize();
-                Thread.Sleep(1000);
-
-                driver.Url = "http://localhost:81/";
-                driver.Navigate();
-                status = driver != null;
                 if (status)
                 {
                     Thread.Sleep(2000);
@@ -48,7 +52,7 @@ namespace do_an.CRUD_test
                     status = enterEmail != null;
                     if (status)
                     {
-                        enterEmail.SendKeys("admin123@gmail.com");
+                        enterEmail.SendKeys(email);
                     }
                     Thread.Sleep(2000);
                     var enterPassword = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/input[2]"));
@@ -56,7 +60,7 @@ namespace do_an.CRUD_test
                     status = enterPassword != null;
                     if (status)
                     {
-                        enterPassword.SendKeys("admin123");
+                        enterPassword.SendKeys(password);
                     }
                     Thread.Sleep(2000);
                     var clickLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/button[1]"));
@@ -74,18 +78,24 @@ namespace do_an.CRUD_test
                 Assert.IsFalse(status);
                 driver.Quit();
             }
-            Assert.IsTrue(status);
+        }
+        public void Logout()
+        {
+            driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[1]/div/div[3]/div/a[1]/div/span[1]")).Click();
+            driver.FindElement(By.XPath("/html/body/div[1]/div[2]/div/div/div[2]/div[1]/div[2]/form/div/a")).Click();
+            Thread.Sleep(3000);
         }
 
         [TestMethod]
         [DataTestMethod]
         //[DataRow(CRUD_data.Category.create.Consts.name,CRUD_data.Category.create.Consts.description)]
-        [DynamicData(nameof(GetLoginCredentialsFromExcel), DynamicDataSourceType.Method)]
-        public void create(string name, string description, string expect)
+        [DynamicData(nameof(GetAddCategoryCredentialsFromExcel), DynamicDataSourceType.Method)]
+        public void create(string email, string password, string name, string description, string rowValue)
         {
             string actual_result = "";
-            string result = "";
             bool status = true;
+            int row = int.Parse(rowValue);
+            Login(email, password);
             try
             {
                 driver.SwitchTo().NewWindow(WindowType.Tab);
@@ -137,45 +147,48 @@ namespace do_an.CRUD_test
                         Thread.Sleep(1000);
                         var searchCode = driver.FindElement(By.ClassName("sorting_1"));
                         string checkName = searchCode.Text;
-                        if (checkName == expect)
+                        if (checkName == name)
                         {
                             actual_result = checkName;
-                            result = "Pass";
                             status = true;
                         }
                         else
                         {
                             actual_result = checkName;
-                            result = "Faild";
                             status = false;
                         }
-                    }
-                    else
-                    {
-                        actual_result = "";
-                        result = "Faild";
-                        status = false;
                     }
                 }
             }
             catch(Exception ex)
             {
-                Assert.IsFalse(status);
-                driver.Close();
-                driver.Quit();
+                string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateName != null)
+                {
+                    actual_result = validateName;
+                }
+                Thread.Sleep(1000);
+                string validateDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/span[1]")).Text;
+                if (validateDescription != null)
+                {
+                    actual_result = actual_result + validateDescription;
+                }
+                Thread.Sleep(1000);
             }
-
-            //Assert.IsTrue(status);
-            UpdateExcelResult(actual_result, result);
-            driver.Close();
+            AddCategoryExcelResult(actual_result, row);
         }
 
         [TestMethod]
         [DataTestMethod]
-        [DataRow(CRUD_data.Category.update.Consts.name, CRUD_data.Category.update.Consts.description, CRUD_data.Category.update.Consts.newName)]
-        public void Update(string name, string description,string newName)
+        //[DataRow(CRUD_data.Category.update.Consts.name, CRUD_data.Category.update.Consts.description, CRUD_data.Category.update.Consts.newName)]
+        [DynamicData(nameof(GetUpdateCategoryCredentialsFromExcel), DynamicDataSourceType.Method)]
+
+        public void Update(string email, string password, string name, string description, string newName, string rowValue)
         {
+            string actual_result = "";
             bool status = true;
+            int row = int.Parse(rowValue);
+            Login(email, password);
             try
             {
                 driver.SwitchTo().NewWindow(WindowType.Tab);
@@ -258,6 +271,7 @@ namespace do_an.CRUD_test
                         status = dataempty != null;
                         if (status)
                         {
+                            actual_result = dataempty.Text;
                             status = true;
                         }
                         Thread.Sleep(1000);
@@ -266,19 +280,31 @@ namespace do_an.CRUD_test
             }
             catch(Exception ex)
             {
-                Assert.IsFalse(status);
-                driver.Close();
-                driver.Quit();
+                string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                if (validateName != null)
+                {
+                    actual_result = validateName;
+                }
+                Thread.Sleep(1000);
+                string validateDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/span[1]")).Text;
+                if (validateDescription != null)
+                {
+                    actual_result = actual_result + validateDescription;
+                }
+                Thread.Sleep(1000);
             }
-            Assert.IsTrue(status);
-            driver.Close();
+            UpdateCategoryExcelResult(actual_result, row);
         }
 
         [TestMethod]
         [DataTestMethod]
-        [DataRow(CRUD_data.Category.delete.Consts.name)]
-        public void delete(string name)
+        //[DataRow(CRUD_data.Category.delete.Consts.name)]
+        [DynamicData(nameof(GetDeleteCategoryCredentialsFromExcel), DynamicDataSourceType.Method)]
+
+        public void delete(string name, string rowValue)
         {
+            string actual_result = "";
+            int row = int.Parse(rowValue);
             bool status = true;
             try
             {
@@ -333,27 +359,127 @@ namespace do_an.CRUD_test
                         status = dataempty != null;
                         if (status)
                         {
+                            actual_result = dataempty.Text;
                             status = true;
                         }
                         Thread.Sleep(1000);
-
-                        //var namecheck = driver.FindElement(By.ClassName("sorting_1"));
-                        //bool checkdele = (namecheck.Text == name);
-                        //if (checkdele)
-                        //{
-                        //    status = true;
-                        //}
                     }
                 }
             }
             catch(Exception ex)
             {
-                Assert.IsFalse(status);
-                driver.Close();
                 driver.Quit();
             }
-            Assert.IsTrue(status);
-            driver.Close();
+            DeleteCategoryExcelResult(actual_result, row);
+        }
+
+        [TestMethod]
+        [DataTestMethod]
+        [DynamicData(nameof(GetSortCategoryCredentialsFromExcel), DynamicDataSourceType.Method)]
+
+        public void sort(string email, string password, string sort, string rowValue)
+        {
+            int row = int.Parse(rowValue);
+            string actual_result = "";
+            Login(email, password);
+            Thread.Sleep(1000);
+            bool status = true;
+            try
+            {
+                driver.SwitchTo().NewWindow(WindowType.Tab);
+                driver.Navigate().GoToUrl("http://localhost:81/admin");
+                status = driver != null;
+                if (status)
+                {
+                    var clickBrand = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/a[1]/span[1]"));
+                    status = clickBrand != null;
+                    if (status)
+                    {
+                        clickBrand.Click();
+                    }
+                    Thread.Sleep(1000);
+                    var clickShow = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/ul[1]/li[3]/div[1]/div[1]/a[1]"));
+                    status = clickShow != null;
+                    if (status)
+                    {
+                        clickShow.Click();
+                    }
+                    Thread.Sleep(1000);
+                    if (sort == "Name")
+                    {
+                        var clickSortName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/thead[1]/tr[1]/th[1]"));
+                        status = clickSortName != null;
+                        if (status)
+                        {
+                            clickSortName.Click();
+                        }
+                        Thread.Sleep(1000);
+                        var itemSort = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]"));
+                        status = itemSort != null;
+                        if (status)
+                        {
+                            actual_result = itemSort.Text;
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    if (sort == "Description")
+                    {
+                        var clickSortDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/thead[1]/tr[1]/th[2]"));
+                        status = clickSortDescription != null;
+                        if (status)
+                        {
+                            clickSortDescription.Click();
+                        }
+                        Thread.Sleep(1000);
+                        var itemSort = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]"));
+                        status = itemSort != null;
+                        if (status)
+                        {
+                            actual_result = itemSort.Text;
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    if (sort == "Created at")
+                    {
+                        var clickSortCrea = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/thead[1]/tr[1]/th[3]"));
+                        status = clickSortCrea != null;
+                        if (status)
+                        {
+                            clickSortCrea.Click();
+                        }
+                        Thread.Sleep(1000);
+                        var itemSort = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[3]"));
+                        status = itemSort != null;
+                        if (status)
+                        {
+                            actual_result = itemSort.Text;
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    if (sort == "Updated at")
+                    {
+                        var clickSortUp = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/thead[1]/tr[1]/th[4]"));
+                        status = clickSortUp != null;
+                        if (status)
+                        {
+                            clickSortUp.Click();
+                        }
+                        Thread.Sleep(1000);
+                        var itemSort = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[4]"));
+                        status = itemSort != null;
+                        if (status)
+                        {
+                            actual_result = itemSort.Text;
+                            Thread.Sleep(1000);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                driver.Quit();
+            }
+            SortCategoryExcelResult(actual_result, row);
         }
         private static IEnumerable<object[]> GetLoginCredentialsFromExcel()
         {
@@ -396,6 +522,189 @@ namespace do_an.CRUD_test
         public void clear()
         {
             driver.Quit();
+        }
+        private static IEnumerable<object[]> GetAddCategoryCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[5];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueName = worksheet.Cells[row, 5].Value;
+                    string name = cellValueName != null ? cellValueName.ToString() : string.Empty;
+                    object cellValueDescription = worksheet.Cells[row, 6].Value;
+                    string description = cellValueDescription != null ? cellValueDescription.ToString() : string.Empty;
+                    yield return new string[] { email, password, name, description, rowValue };
+                }
+            }
+        }
+
+        private void AddCategoryExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[5];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 7].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 8].Value = actual_result;
+                    worksheet.Cells[row, 9].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 8].Value = actual_result;
+                    worksheet.Cells[row, 9].Value = "Faild";
+                }
+                package.Save();
+            }
+        }
+        private static IEnumerable<object[]> GetUpdateCategoryCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[6];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueName = worksheet.Cells[row, 5].Value;
+                    string name = cellValueName != null ? cellValueName.ToString() : string.Empty;
+                    object cellValueNewName = worksheet.Cells[row, 6].Value;
+                    string newname = cellValueNewName != null ? cellValueNewName.ToString() : string.Empty;
+                    object cellValueDescription = worksheet.Cells[row, 7].Value;
+                    string description = cellValueDescription != null ? cellValueDescription.ToString() : string.Empty;
+                    yield return new string[] { email, password, name, newname, description, rowValue };
+                }
+            }
+        }
+        private void UpdateCategoryExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[6];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 8].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 9].Value = actual_result;
+                    worksheet.Cells[row, 10].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 9].Value = actual_result;
+                    worksheet.Cells[row, 10].Value = "Faild";
+                }
+                package.Save();
+            }
+        }
+        private static IEnumerable<object[]> GetDeleteCategoryCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[7];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueName = worksheet.Cells[row, 5].Value;
+                    string name = cellValueName != null ? cellValueName.ToString() : string.Empty;
+                    yield return new string[] { email, password, name, rowValue };
+                }
+            }
+        }
+        private void DeleteCategoryExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[7];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 6].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 7].Value = actual_result;
+                    worksheet.Cells[row, 8].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 7].Value = actual_result;
+                    worksheet.Cells[row, 8].Value = "Faild";
+                }
+                package.Save();
+            }
+        }
+        private static IEnumerable<object[]> GetSortCategoryCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[8];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object cellValueSort = worksheet.Cells[row, 5].Value;
+                    string sort = cellValueSort != null ? cellValueSort.ToString() : string.Empty;
+                    yield return new string[] { email, password, sort, rowValue };
+                }
+            }
+        }
+        private void SortCategoryExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[8];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 6].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 7].Value = actual_result;
+                    worksheet.Cells[row, 8].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 7].Value = actual_result;
+                    worksheet.Cells[row, 8].Value = "Faild";
+                }
+                package.Save();
+            }
         }
     }
 }

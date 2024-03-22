@@ -5,8 +5,9 @@
     "\\do_an\\CLIENT",
     "\\do_an\\CRUD_data",
     "\\do_an\\CRUD_data\\Product",
-    "\\do_an\\CRUD_test"
+    "\\do_an\\CRUD_test",
+    "\\do_an\\QuanLyDonHang"
   ],
-  "SelectedNode": "\\do_an\\CLIENT\\Account.cs",
+  "SelectedNode": "\\do_an\\CRUD_test\\product.cs",
   "PreviewInSolutionExplorer": false
 }
