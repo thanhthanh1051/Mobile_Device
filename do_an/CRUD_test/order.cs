@@ -5,6 +5,9 @@ using System;
 using System.Threading;
 using Microsoft.Office.Interop.Excel;
 using OpenQA.Selenium.Support.UI;
+using OfficeOpenXml;
+using System.Collections.Generic;
+using System.IO;
 
 namespace do_an.CRUD_test
 {
@@ -13,18 +16,22 @@ namespace do_an.CRUD_test
     {
         IWebDriver driver = new ChromeDriver();
         [TestInitialize]
-        public void Test_Login()
+        public void Init()
         {
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(1000);
 
+            driver.Url = "http://localhost:81/";
+            driver.Navigate();
+            Thread.Sleep(1000);
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(1000);
+        }
+        public void Login(string email, string password)
+        {
             bool status = true;
             try
             {
-                driver.Manage().Window.Maximize();
-                Thread.Sleep(1000);
-
-                driver.Url = "http://localhost:81/";
-                driver.Navigate();
-                status = driver != null;
                 if (status)
                 {
                     Thread.Sleep(2000);
@@ -41,7 +48,7 @@ namespace do_an.CRUD_test
                     status = enterEmail != null;
                     if (status)
                     {
-                        enterEmail.SendKeys("admin123@gmail.com");
+                        enterEmail.SendKeys(email);
                     }
                     Thread.Sleep(2000);
                     var enterPassword = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/input[2]"));
@@ -49,7 +56,7 @@ namespace do_an.CRUD_test
                     status = enterPassword != null;
                     if (status)
                     {
-                        enterPassword.SendKeys("admin123");
+                        enterPassword.SendKeys(password);
                     }
                     Thread.Sleep(2000);
                     var clickLogin = driver.FindElement(By.XPath("/html[1]/body[1]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/form[1]/button[1]"));
@@ -67,11 +74,20 @@ namespace do_an.CRUD_test
                 Assert.IsFalse(status);
                 driver.Quit();
             }
-            Assert.IsTrue(status);
+        }
+        public void Logout()
+        {
+            driver.FindElement(By.XPath("/html/body/div[1]/header/div/div[1]/div/div[3]/div/a[1]/div/span[1]")).Click();
+            driver.FindElement(By.XPath("/html/body/div[1]/div[2]/div/div/div[2]/div[1]/div[2]/form/div/a")).Click();
+            Thread.Sleep(3000);
         }
 
-        public void Cancelled()
+        public void Status(string email, string password, string statusOrder, string rowValue)
         {
+            int row = int.Parse(rowValue);
+            string actual_result = "";
+            Login(email, password);
+            Thread.Sleep(1000);
             bool status = true;
             try
             {
@@ -106,7 +122,7 @@ namespace do_an.CRUD_test
                     if (status)
                     {
                         var selectElement = new SelectElement(clickStatus);
-                        selectElement.SelectByValue("2");
+                        selectElement.SelectByValue(statusOrder);
                         clickStatus.Click();
                     }
                     Thread.Sleep(1000);
@@ -115,18 +131,59 @@ namespace do_an.CRUD_test
                     if (status)
                     {
                         update.Click();
+                        actual_result = "Pass";
                     }
                     Thread.Sleep(1000);
                 }
                }
             catch(Exception ex)
             {
-                Assert.IsFalse(status);
-                driver.Close();
+                actual_result = "Faild";
                 driver.Quit();
             }
-            Assert.IsTrue(status);
-            driver.Close();
+            StatusOrderExcelResult(actual_result, row);
+        }
+        private static IEnumerable<object[]> GetStatusOrderCredentialsFromExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                var worksheet = package.Workbook.Worksheets[12];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string rowValue = worksheet.Cells[row, 1].Value.ToString();
+                    string email = worksheet.Cells[row, 3].Value.ToString();
+                    string password = worksheet.Cells[row, 4].Value.ToString();
+                    object statusOrder = worksheet.Cells[row, 5].Value;
+                    string status = statusOrder != null ? statusOrder.ToString() : string.Empty;
+                    yield return new string[] { email, password, status, rowValue };
+                }
+            }
+        }
+        private void StatusOrderExcelResult(string actual_result, int row)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            string filePath = @"D:\Baodamchatluong_TH\DO_AN\TestCaseALL.xlsx";
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[12];
+                int rowCount = worksheet.Dimension.Rows;
+                string expected = worksheet.Cells[row, 6].Value.ToString();
+                if (actual_result == expected)
+                {
+                    worksheet.Cells[row, 7].Value = "Pass";
+                }
+                else
+                {
+                    worksheet.Cells[row, 7].Value = "Faild";
+                }
+                package.Save();
+            }
         }
     }
 }

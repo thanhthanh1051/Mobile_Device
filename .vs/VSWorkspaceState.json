@@ -6,8 +6,9 @@
     "\\do_an\\CRUD_data",
     "\\do_an\\CRUD_data\\Product",
     "\\do_an\\CRUD_test",
+    "\\do_an\\DashBoard",
     "\\do_an\\QuanLyDonHang"
   ],
-  "SelectedNode": "\\do_an\\CRUD_test\\product.cs",
+  "SelectedNode": "\\do_an.sln",
   "PreviewInSolutionExplorer": false
 }

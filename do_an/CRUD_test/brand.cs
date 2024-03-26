@@ -19,10 +19,6 @@ namespace do_an.CRUD_test
     [TestClass]
     public class brand
     {
-        //string fNumber = null;
-        //string sNumber = null;
-        //string f1Number = null;
-        //string f2Number = null;
         IWebDriver driver = new ChromeDriver();
         [TestInitialize]
         public void Init()
@@ -167,19 +163,26 @@ namespace do_an.CRUD_test
             }
             catch (Exception ex)
             {
-                string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
-                if (validateName != null)
+                try
                 {
-                    actual_result = validateName;
+                    string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                    if (validateName != null)
+                    {
+                        actual_result = validateName;
+                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
-                string validateDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/span[1]")).Text;
-                if (validateDescription != null)
+                catch{}
+                try
                 {
-                    actual_result = actual_result + validateDescription;
-                }
-                Thread.Sleep(1000);
-              
+                    Thread.Sleep(1000);
+                    string validateDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/span[1]")).Text;
+                    if (validateDescription != null)
+                    {
+                        actual_result = actual_result + validateDescription;
+                    }
+                    Thread.Sleep(1000);
+                }catch{}
             }
             AddBrandExcelResult(actual_result, row);
         }
@@ -188,7 +191,7 @@ namespace do_an.CRUD_test
         //[DataRow(CRUD_data.Brand.update.Consts.name, CRUD_data.Brand.update.Consts.description, CRUD_data.Brand.update.Consts.newName)]
         [DynamicData(nameof(GetUpdateBrandCredentialsFromExcel), DynamicDataSourceType.Method)]
 
-        public void Update(string email, string password, string name, string description, string newName, string rowValue)
+        public void Update(string email, string password, string name, string newName, string description, string rowValue)
         {
             string actual_result = "";
             int row = int.Parse(rowValue);
@@ -256,51 +259,73 @@ namespace do_an.CRUD_test
                             updateChange.Click();
                         }
                         Thread.Sleep(1000);
-                        var searchAgain = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
-                        status = searchAgain != null;
-                        if (status)
+                        try
                         {
-                            searchAgain.SendKeys(newName);
-                            Thread.Sleep(1000);
-                            try
+                            var searchAgain = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                            status = searchAgain != null;
+                            if (status)
                             {
-                                var searchBrand = driver.FindElement(By.ClassName("sorting_1"));
-                                status = searchBrand != null;
-                                if (status)
-                                {
-                                    actual_result = searchBrand.Text;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                var dataempty = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]"));
+                                searchAgain.SendKeys(newName);
                                 Thread.Sleep(1000);
-                                status = dataempty != null;
-                                if (status)
+                                try
                                 {
-                                    actual_result = dataempty.Text;
+                                    var searchBrand = driver.FindElement(By.ClassName("sorting_1"));
+                                    status = searchBrand != null;
+                                    if (status)
+                                    {
+                                        actual_result = searchBrand.Text;
+                                    }
                                 }
-                                Thread.Sleep(1000);
+                                catch (Exception ex)
+                                {
+                                    var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                                    Thread.Sleep(1000);
+                                    status = dataempty != null;
+                                    if (status)
+                                    {
+                                        actual_result = dataempty.Text;
+                                    }
+                                    Thread.Sleep(1000);
+                                }
                             }
                         }
+                        catch
+                        {
+                            var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
+                            Thread.Sleep(1000);
+                            status = dataempty != null;
+                            if (status)
+                            {
+                                actual_result = dataempty.Text;
+                            }
+                            Thread.Sleep(1000);
+                        }
+                      
                     }
                 }
-
             }
             catch (Exception ex)
             {
-                string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
-                if (validateName != null)
+                try
                 {
-                    actual_result = validateName;
+                    string validateName = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/span[1]")).Text;
+                    if (validateName != null)
+                    {
+                        actual_result = validateName;
+                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
-                string validateDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/span[1]")).Text;
-                if (validateDescription != null)
+                catch { }
+                try
                 {
-                    actual_result = actual_result + validateDescription;
+                    string validateDescription = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/span[1]")).Text;
+                    if (validateDescription != null)
+                    {
+                        actual_result = actual_result + validateDescription;
+                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
+                catch { }
             }
             UpdateBrandExcelResult(actual_result, row);
         }
@@ -309,10 +334,11 @@ namespace do_an.CRUD_test
         [DataTestMethod]
         //[DataRow(CRUD_data.Brand.delete.Consts.name)]
         [DynamicData(nameof(GetDeleteBrandCredentialsFromExcel), DynamicDataSourceType.Method)]
-        public void delete(string name, string rowValue)
+        public void delete(string email, string password, string name, string rowValue)
         {
             string actual_result = "";
             int row = int.Parse(rowValue);
+            Login(email, password);
             bool status = true;
             try
             {
@@ -342,34 +368,49 @@ namespace do_an.CRUD_test
                         clickSearch.SendKeys(name);
                     }
                     Thread.Sleep(1000);
-                    var searchName = driver.FindElement(By.ClassName("sorting_1"));
-                    string check = searchName.Text;
-                    if (check == name)
+                    try
                     {
-                        var dele = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[6]/a[1]"));
-                        status = dele != null;
-                        if (status)
+                        var searchName = driver.FindElement(By.ClassName("sorting_1"));
+                        string check = searchName.Text;
+                        if (check == name)
                         {
-                            dele.Click();
+                            var dele = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[6]/a[1]"));
+                            status = dele != null;
+                            if (status)
+                            {
+                                dele.Click();
+                            }
+                            Thread.Sleep(1000);
+                            var searchAgain = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
+                            status = searchAgain != null;
+                            if (status)
+                            {
+                                searchAgain.SendKeys(name);
+                            }
+                            Thread.Sleep(1000);
+                            var dataempty = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]"));
+                            Thread.Sleep(1000);
+                            status = dataempty != null;
+                            if (status)
+                            {
+                                actual_result = dataempty.Text;
+                                status = true;
+                            }
+                            Thread.Sleep(1000);
                         }
-                        Thread.Sleep(1000);
-                        var searchAgain = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/label[1]/input[1]"));
-                        status = searchAgain != null;
-                        if (status)
-                        {
-                            searchAgain.SendKeys(name);
-                        }
-                        Thread.Sleep(1000);
-                        var dataempty = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[1]"));
+                    }
+                    catch
+                    {
+                        var dataempty = driver.FindElement(By.ClassName("dataTables_empty"));
                         Thread.Sleep(1000);
                         status = dataempty != null;
                         if (status)
                         {
                             actual_result = dataempty.Text;
-                            status = true;
                         }
                         Thread.Sleep(1000);
                     }
+
                 }
             }
             catch (Exception ex)
@@ -437,6 +478,7 @@ namespace do_an.CRUD_test
                         if (status)
                         {
                             clickSortDescription.Click();
+                            clickSortDescription.Click();
                         }
                         Thread.Sleep(1000);
                         var itemSort = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[2]"));
@@ -454,6 +496,7 @@ namespace do_an.CRUD_test
                         if (status)
                         {
                             clickSortCrea.Click();
+                            clickSortCrea.Click();
                         }
                         Thread.Sleep(1000);
                         var itemSort = driver.FindElement(By.XPath("/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/table[1]/tbody[1]/tr[1]/td[3]"));
@@ -470,6 +513,7 @@ namespace do_an.CRUD_test
                         status = clickSortUp != null;
                         if (status)
                         {
+                            clickSortUp.Click();
                             clickSortUp.Click();
                         }
                         Thread.Sleep(1000);
@@ -525,7 +569,7 @@ namespace do_an.CRUD_test
 
             using (ExcelPackage package = new ExcelPackage(file))
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[2];
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                     string expected = worksheet.Cells[row, 7].Value.ToString();
                     if (actual_result == expected)
